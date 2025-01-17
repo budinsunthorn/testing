@@ -1,0 +1,798 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["relationJoins"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Organization {
+  id           String       @id @default(cuid())
+  name         String       @unique
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  phone        String       @unique
+  dispensaries Dispensary[]
+  Supplier     Supplier[]
+}
+
+model Dispensary {
+  id                        String              @id @default(cuid())
+  organizationId            String
+  organization              Organization        @relation(fields: [organizationId], references: [id])
+  name                      String
+  cannabisLicense           String              @unique @default("")
+  cannabisLicenseExpireDate String              @default("")
+  businessLicense           String?             @unique
+  phone                     String              @unique
+  email                     String              @unique
+  locationAddress           String
+  locationCity              String
+  locationZipCode           String
+  createdAt                 DateTime            @default(now())
+  updatedAt                 DateTime            @updatedAt
+  dispensaryType            DispensaryType
+  metrcApiKey               String?             @unique
+  metrcConnectionStatus     Boolean             @default(false)
+  metrcLicenseNumber        String?             @unique
+  locationState             StateType
+  isActive                  Boolean             @default(false)
+  isCustomerAgeVerify       Boolean             @default(false)
+  customerAgeLimit          Int                 @default(0)
+  storeTimeZone             Timezones           @default(EST)
+  users                     User[]
+  Product                   Product[]
+  Customer                  Customer[]
+  Loyalty                   Loyalty[]
+  Discount                  Discount[]
+  TaxSetting                TaxSetting[]
+  ItemCategory              ItemCategory[]
+  MetrcCategory             MetrcItemCategory[]
+  Order                     Order[]
+  Inventory                 Inventory[]
+  Package                   Package[]
+  Drawer                    Drawer[]
+  AssignPackage             AssignPackage[]
+  Transfer                  Transfer[]
+  DeliveryPackages          DeliveryPackages[]
+  TaxHistory                TaxHistory[]
+  TaxApply                  TaxApply[]
+  DiscountHistory           DiscountHistory[]
+  CustomerQueue             CustomerQueue[]
+  LoyaltyHistory            LoyaltyHistory[]
+
+  @@unique([organizationId, name])
+}
+
+model User {
+  id                  String          @id @default(cuid())
+  dispensaryId        String
+  dispensary          Dispensary      @relation(fields: [dispensaryId], references: [id])
+  email               String          @unique
+  name                String
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @updatedAt
+  userType            UserType
+  isActive            Boolean         @default(false)
+  isDispensaryAdmin   Boolean         @default(false)
+  isEmailVerified     Boolean         @default(false)
+  isOrganizationAdmin Boolean         @default(false)
+  phone               String          @unique
+  password            String
+  Product             Product[]
+  Order               Order[]
+  Drawer              Drawer[]
+  AssignPackage       AssignPackage[]
+  Transfer            Transfer[]
+  CustomerQueue       CustomerQueue[]
+
+  @@unique([dispensaryId, name])
+}
+
+model Customer {
+  id                           String          @id @default(cuid())
+  name                         String
+  birthday                     String
+  email                        String
+  phone                        String
+  dispensaryId                 String
+  dispensary                   Dispensary      @relation(fields: [dispensaryId], references: [id])
+  isActive                     Boolean
+  driverLicense                String
+  driverLicenseExpirationDate  String
+  isMedical                    Boolean
+  medicalLicense               String
+  medicalLicenseExpirationDate String
+  loyaltyPoints                Float           @default(0)
+  status                       CustomerStatus
+  note                         String          @default("")
+  // discount                     Discount?      @relation(fields: [status], references: [applyTarget])
+  createdAt                    DateTime        @default(now())
+  updatedAt                    DateTime        @updatedAt
+  MFType                       MFType          @default(MALE)
+  Order                        Order[]
+  CustomerQueue                CustomerQueue[]
+
+  @@unique([dispensaryId, medicalLicense])
+}
+
+model CustomerQueue {
+  id           String     @id @default(cuid())
+  dispensaryId String
+  dispensary   Dispensary @relation(fields: [dispensaryId], references: [id])
+  customerId   String
+  customer     Customer   @relation(fields: [customerId], references: [id])
+  userId       String
+  user         User       @relation(fields: [userId], references: [id])
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  @@unique([dispensaryId, customerId])
+}
+
+model Supplier {
+  id              String        @id @default(cuid())
+  organizationId  String
+  organization    Organization  @relation(fields: [organizationId], references: [id])
+  name            String
+  businessLicense String        @unique
+  UBI             String?
+  phone           String?       @unique
+  email           String?
+  locationAddress String?
+  locationCity    String?
+  locationZipCode String?
+  supplierType    SupplierType?
+  isActive        Boolean
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  locationState   StateType?
+  Product         Product[]
+
+  @@unique([organizationId, businessLicense])
+}
+
+model Order {
+  id                Int               @id @default(autoincrement())
+  dispensaryId      String
+  dispensary        Dispensary        @relation(fields: [dispensaryId], references: [id])
+  drawerId          String
+  drawer            Drawer            @relation(fields: [drawerId], references: [id])
+  userId            String
+  user              User              @relation(fields: [userId], references: [id])
+  customerId        String?
+  customer          Customer?         @relation(fields: [customerId], references: [id])
+  orderType         OrderType         @default(SALE)
+  description       String?
+  cost              Float?            @default(0)
+  cashAmount        Float?            @default(0)
+  changeDue         Float?            @default(0)
+  otherAmount       Float?            @default(0)
+  loyalty           Float?            @default(0)
+  tax               Float?            @default(0)
+  discount          Float?            @default(0)
+  mjType            OrderMjType       @default(NONE)
+  status            OrderStatus
+  orderDate         String?
+  isReportedToMetrc Boolean           @default(false)
+  metrcId           Int?
+  originalOrder     Int?              @default(0)
+  returnReason      String?
+  voidReason        String?
+  voidedAt          DateTime?
+  completedAt       DateTime?
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  OrderItem         OrderItem[]
+  TaxHistory        TaxHistory[]
+  DiscountHistory   DiscountHistory[]
+  LoyaltyHistory    LoyaltyHistory[]
+}
+
+model OrderItem {
+  id                 String       @id @default(cuid())
+  orderId            Int
+  order              Order        @relation(fields: [orderId], references: [id])
+  productId          String
+  product            Product      @relation(fields: [productId], references: [id])
+  quantity           Float
+  isReturned         Boolean      @default(false)
+  isRestockForReturn Boolean      @default(false)
+  price              Float        @default(0)
+  cost               Float        @default(0)
+  amount             Float        @default(0)
+  discountedAmount   Float        @default(0)
+  loyaltyAmount      Float        @default(0)
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+  TaxHistory         TaxHistory[]
+}
+
+model Inventory {
+  id           String     @id @default(cuid())
+  dispensaryId String
+  dispensary   Dispensary @relation(fields: [dispensaryId], references: [id])
+  quantity     Float
+}
+
+model Loyalty {
+  id               String      @id @default(cuid())
+  dispensaryId     String
+  dispensary       Dispensary  @relation(fields: [dispensaryId], references: [id])
+  name             String
+  type             LoyaltyType @default(MANUAL)
+  pointWorth       Float
+  applyDurationSet Boolean
+  applyFrom        String
+  applyTo          String
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+  color            String
+  isActive         Boolean
+  isAdminPin       Boolean
+
+  @@unique([dispensaryId, name])
+}
+
+model Discount {
+  id                         String         @id @default(cuid())
+  dispensaryId               String
+  dispensary                 Dispensary     @relation(fields: [dispensaryId], references: [id])
+  applyTarget                CustomerStatus
+  name                       String
+  type                       DiscountType   @default(OTHER)
+  applyDurationSet           Boolean
+  applyFrom                  String
+  applyTo                    String
+  isActive                   Boolean
+  isAdminPin                 Boolean
+  isEnterManualAmount        Boolean        @default(false)
+  isLimitManualAmount        Boolean        @default(false)
+  manualDiscountLimitPercent Float          @default(0)
+  color                      String
+  createdAt                  DateTime       @default(now())
+  updatedAt                  DateTime       @updatedAt
+  discountPercent            Float          @default(0)
+
+  @@unique([dispensaryId, name])
+}
+
+model DiscountHistory {
+  id             String         @id @default(cuid())
+  dispensaryId   String
+  dispensary     Dispensary     @relation(fields: [dispensaryId], references: [id])
+  orderId        Int
+  order          Order          @relation(fields: [orderId], references: [id])
+  discountName   String
+  discountMethod DiscountMethod
+  value          Float          @default(0)
+}
+
+model LoyaltyHistory {
+  id           String      @id @default(cuid())
+  dispensaryId String
+  dispensary   Dispensary  @relation(fields: [dispensaryId], references: [id])
+  orderId      Int
+  order        Order       @relation(fields: [orderId], references: [id])
+  loyaltyName  String
+  loyaltyType  LoyaltyType
+  value        Float       @default(0)
+}
+
+model ItemCategory {
+  id            String     @id @default(cuid())
+  dispensaryId  String
+  dispensary    Dispensary @relation(fields: [dispensaryId], references: [id])
+  metrcCategory String
+  name          String
+  color         String     @default("#03a9f4")
+  containMj     Boolean    @default(false)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  Product       Product[]
+
+  @@unique([dispensaryId, name])
+}
+
+model TaxSetting {
+  id                        String            @id @default(cuid())
+  dispensaryId              String
+  dispensary                Dispensary        @relation(fields: [dispensaryId], references: [id])
+  name                      String
+  rate                      Float
+  applyTo                   TaxSettingApplyTo
+  compoundTaxes             String[]
+  isExcludeFromRecreational Boolean           @default(false)
+  isExcludeFromTaxExempt    Boolean           @default(false)
+  createdAt                 DateTime          @default(now())
+  updatedAt                 DateTime          @updatedAt
+  categories                Json[]
+
+  @@unique([dispensaryId, name])
+}
+
+model TaxHistory {
+  id              String     @id @default(cuid())
+  dispensaryId    String
+  dispensary      Dispensary @relation(fields: [dispensaryId], references: [id])
+  orderId         Int
+  order           Order      @relation(fields: [orderId], references: [id])
+  orderItemId     String
+  orderItem       OrderItem  @relation(fields: [orderItemId], references: [id])
+  taxName         String
+  taxPercent      Float      @default(0)
+  compoundPercent Float      @default(0)
+  taxAmount       Float
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+}
+
+model TaxApply {
+  id              String            @id @default(cuid())
+  dispensaryId    String
+  dispensary      Dispensary        @relation(fields: [dispensaryId], references: [id])
+  applyTo         TaxSettingApplyTo @default(MJ)
+  taxName         String
+  basePercent     Float             @default(0)
+  compoundPercent Float             @default(0)
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+}
+
+model Drawer {
+  id           String       @id @default(cuid())
+  dispensaryId String
+  dispensary   Dispensary   @relation(fields: [dispensaryId], references: [id])
+  userId       String
+  user         User         @relation(fields: [userId], references: [id])
+  startAmount  Float
+  endAmount    Float?
+  cashSales    Float?       @default(0)
+  note         String
+  comment      String?
+  status       DrawerStatus
+  register     String
+  isUsing      Boolean      @default(false)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  Order        Order[]
+  MoneyDrop    MoneyDrop[]
+}
+
+model MoneyDrop {
+  id        String   @id @default(cuid())
+  drawerId  String
+  drawer    Drawer   @relation(fields: [drawerId], references: [id])
+  dropType  DropType
+  amount    Float    @default(0)
+  reason    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Transfer {
+  id                           String         @id @default(cuid())
+  dispensaryId                 String
+  dispensary                   Dispensary     @relation(fields: [dispensaryId], references: [id])
+  userId                       String
+  user                         User           @relation(fields: [userId], references: [id])
+  transferType                 TransferType
+  isMJ                         Boolean
+  status                       TransferStatus
+  //Metrc indexes start
+  transferId                   Int            @unique
+  deliveryId                   Int?
+  PackageCount                 Int?
+  ReceivedPackageCount         Int?
+  CreatedDateTime              String?
+  ReceivedDateTime             String?
+  ShipperFacilityLicenseNumber String?
+  ShipperFacilityName          String?
+  //Metrc indexes end
+  createdAt                    DateTime       @default(now())
+  updatedAt                    DateTime       @updatedAt
+}
+
+model Product {
+  id                     String          @id @default(cuid())
+  dispensaryId           String
+  dispensary             Dispensary      @relation(fields: [dispensaryId], references: [id])
+  userId                 String
+  user                   User            @relation(fields: [userId], references: [id])
+  supplierId             String
+  supplier               Supplier        @relation(fields: [supplierId], references: [id])
+  itemCategoryId         String
+  itemCategory           ItemCategory    @relation(fields: [itemCategoryId], references: [id])
+  name                   String
+  sku                    String?
+  upc                    String?
+  price                  Float
+  unitOfMeasure          String
+  unitWeight             Float
+  netWeight              Float
+  stock                  Float?          @default(0)
+  isConnectedWithPackage Boolean         @default(false)
+  createdAt              DateTime        @default(now())
+  updatedAt              DateTime        @updatedAt
+  Package                Package[]
+  AssignPackage          AssignPackage[]
+  OrderItem              OrderItem[]
+
+  @@unique([dispensaryId, name])
+}
+
+model MetrcItemCategory {
+  id                                String     @id @default(cuid())
+  dispensaryId                      String
+  dispensary                        Dispensary @relation(fields: [dispensaryId], references: [id])
+  Name                              String     @unique
+  ProductCategoryType               String
+  QuantityType                      String
+  RequiresStrain                    Boolean
+  RequiresItemBrand                 Boolean
+  RequiresAdministrationMethod      Boolean
+  RequiresUnitCbdPercent            Boolean
+  RequiresUnitCbdContent            Boolean
+  RequiresUnitCbdContentDose        Boolean
+  RequiresUnitThcPercent            Boolean
+  RequiresUnitThcContent            Boolean
+  RequiresUnitThcContentDose        Boolean
+  RequiresUnitVolume                Boolean
+  RequiresUnitWeight                Boolean
+  RequiresServingSize               Boolean
+  RequiresSupplyDurationDays        Boolean
+  RequiresNumberOfDoses             Boolean
+  RequiresPublicIngredients         Boolean
+  RequiresDescription               Boolean
+  RequiresAllergens                 Boolean
+  RequiresProductPhotos             Int
+  RequiresProductPhotoDescription   Boolean
+  RequiresLabelPhotos               Int
+  RequiresLabelPhotoDescription     Boolean
+  RequiresPackagingPhotos           Int
+  RequiresPackagingPhotoDescription Boolean
+  CanContainSeeds                   Boolean
+  CanBeRemediated                   Boolean
+  CanBeDestroyed                    Boolean
+  CanBeDecontaminated               Boolean?
+  RequiresProductPDFDocuments       Int
+  LabTestBatchNames                 String[]
+  createdAt                         DateTime   @default(now())
+  updatedAt                         DateTime   @updatedAt
+
+  @@unique([dispensaryId, Name])
+}
+
+model AssignPackage {
+  id           String     @id @default(cuid())
+  dispensaryId String
+  dispensary   Dispensary @relation(fields: [dispensaryId], references: [id])
+  userId       String
+  user         User       @relation(fields: [userId], references: [id])
+  productId    String?
+  product      Product?   @relation(fields: [productId], references: [id])
+  Label        String?    @unique
+  packageId    Int?
+  quantity     Float?     @default(0)
+  cost         Float?     @default(0)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+}
+
+model Package {
+  id                                      String             @id @default(cuid())
+  dispensaryId                            String
+  dispensary                              Dispensary         @relation(fields: [dispensaryId], references: [id])
+  packageId                               Int                @unique
+  packageStatus                           PackageStatus      @default(PENDING)
+  productId                               String?
+  product                                 Product?           @relation(fields: [productId], references: [id])
+  cost                                    Float?             @default(0)
+  originalQty                             Float?             @default(0)
+  Quantity                                Float?             @default(0)
+  isConnectedWithProduct                  Boolean?           @default(false)
+  packageLabel                            String?
+  PackageType                             String?
+  SourceHarvestCount                      Int?
+  SourcePackageCount                      Int?
+  SourceProcessingJobCount                Int?
+  SourceHarvestNames                      String?
+  SourcePackageLabels                     String?
+  LocationId                              Int?
+  LocationName                            String?
+  LocationTypeName                        String?
+  UnitOfMeasureName                       String?
+  UnitOfMeasureAbbreviation               String?
+  PatientLicenseNumber                    String?
+  ItemFromFacilityLicenseNumber           String?
+  ItemFromFacilityName                    String?
+  Note                                    String?
+  PackagedDate                            String?
+  ExpirationDate                          String?
+  SellByDate                              String?
+  UseByDate                               String?
+  InitialLabTestingState                  String?
+  LabTestingState                         String?
+  LabTestingStateDate                     String?
+  LabTestingPerformedDate                 String?
+  LabTestResultExpirationDateTime         String?
+  LabTestingRecordedDate                  String?
+  IsProductionBatch                       Boolean?
+  ProductionBatchNumber                   String?
+  SourceProductionBatchNumbers            String?
+  IsTradeSample                           Boolean?
+  IsTradeSamplePersistent                 Boolean?
+  SourcePackageIsTradeSample              Boolean?
+  IsDonation                              Boolean?
+  IsDonationPersistent                    Boolean?
+  SourcePackageIsDonation                 Boolean?
+  IsTestingSample                         Boolean?
+  IsProcessValidationTestingSample        Boolean?
+  ProductRequiresRemediation              Boolean?
+  ContainsRemediatedProduct               Boolean?
+  RemediationDate                         String?
+  ProductRequiresDecontamination          Boolean?
+  ContainsDecontaminatedProduct           Boolean?
+  DecontaminationDate                     Boolean?
+  ReceivedDateTime                        String?
+  ReceivedFromManifestNumber              String?
+  ReceivedFromFacilityLicenseNumber       String?
+  ReceivedFromFacilityName                String?
+  IsOnHold                                Boolean?
+  IsOnRecall                              Boolean?
+  ArchivedDate                            String?
+  IsFinished                              Boolean?
+  FinishedDate                            String?
+  IsOnTrip                                Boolean?
+  IsOnRetailerDelivery                    Boolean?
+  PackageForProductDestruction            String?
+  LastModified                            String?
+  RetailIdQrCount                         Int?
+  itemId                                  Int?
+  itemName                                String?
+  itemProductCategoryName                 String?
+  itemProductCategoryType                 String?
+  itemIsExpirationDateRequired            Boolean?
+  itemHasExpirationDate                   Boolean?
+  itemIsSellByDateRequired                Boolean?
+  itemHasSellByDate                       Boolean?
+  itemIsUseByDateRequired                 Boolean?
+  itemHasUseByDate                        Boolean?
+  itemQuantityType                        String?
+  itemDefaultLabTestingState              String?
+  itemUnitOfMeasureName                   String?
+  itemApprovalStatus                      String?
+  itemApprovalStatusDateTime              String?
+  itemStrainId                            Int?
+  itemStrainName                          String?
+  itemItemBrandId                         Int?
+  itemItemBrandName                       String?
+  itemAdministrationMethod                String?
+  itemUnitCbdPercent                      String?
+  itemUnitCbdContent                      String?
+  itemUnitCbdContentUnitOfMeasureName     String?
+  itemUnitCbdContentDose                  String?
+  itemUnitCbdContentDoseUnitOfMeasureName String?
+  itemUnitThcPercent                      String?
+  itemUnitThcContent                      String?
+  itemUnitThcContentUnitOfMeasureName     String?
+  itemUnitThcContentDose                  String?
+  itemUnitThcContentDoseUnitOfMeasureId   String?
+  itemUnitThcContentDoseUnitOfMeasureName String?
+  itemUnitVolume                          Float?
+  itemUnitVolumeUnitOfMeasureName         String?
+  itemUnitWeight                          Float?
+  itemUnitWeightUnitOfMeasureName         String?
+  itemServingSize                         String?
+  itemNumberOfDoses                       String?
+  itemUnitQuantity                        String?
+  itemUnitQuantityUnitOfMeasureName       String?
+  itemPublicIngredients                   String?
+  itemDescription                         String?
+  itemAllergens                           String?
+  itemProductImages                       String[]
+  itemProductPhotoDescription             String?
+  itemLabelImages                         String[]
+  itemLabelPhotoDescription               String?
+  itemPackagingImages                     String[]
+  itemPackagingPhotoDescription           String?
+  itemProductPDFDocuments                 String[]
+  itemIsUsed                              Boolean?
+  itemLabTestBatchNames                   String[]
+  itemProcessingJobCategoryName           String?
+  itemProductBrandName                    String?
+  ProductLabel                            String?
+  createdAt                               DateTime           @default(now())
+  updatedAt                               DateTime           @updatedAt
+  DeliveryPackages                        DeliveryPackages[]
+
+  @@unique([dispensaryId, packageId])
+}
+
+model DeliveryPackages {
+  id                        String     @id @default(cuid())
+  dispensaryId              String
+  dispensary                Dispensary @relation(fields: [dispensaryId], references: [id])
+  deliveryId                Int?
+  packageId                 Int        @unique
+  packageLabel              String?
+  package                   Package    @relation(fields: [packageId], references: [packageId])
+  ShipmentPackageState      String?
+  ShippedQuantity           Float?
+  ShippedUnitOfMeasureName  String?
+  ReceivedQuantity          Float?     @default(0)
+  ReceivedUnitOfMeasureName String?
+  createdAt                 DateTime   @default(now())
+  updatedAt                 DateTime   @updatedAt
+}
+
+enum StateType {
+  AL
+  AK
+  AZ
+  AR
+  CA
+  CO
+  CT
+  DE
+  FL
+  GA
+  HI
+  ID
+  IL
+  IN
+  IA
+  KS
+  KY
+  LA
+  ME
+  MD
+  MA
+  MI
+  MN
+  MS
+  MO
+  MT
+  NE
+  NV
+  NH
+  NJ
+  NM
+  NY
+  NC
+  ND
+  OH
+  OK
+  OR
+  PA
+  RI
+  SC
+  SD
+  TN
+  TX
+  UT
+  VT
+  VA
+  WA
+  WV
+  WI
+  WY
+}
+
+enum DispensaryType {
+  MED
+  REC
+  MEDREC
+}
+
+enum UserType {
+  USER
+  MANAGER_USER
+  ADMIN_MANAGER_USER
+  SUPER_ADMIN_MANAGER_USER
+}
+
+enum MFType {
+  MALE
+  FEMALE
+}
+
+enum LoyaltyType {
+  MANUAL
+  OTHER
+}
+
+enum DiscountType {
+  MANUAL
+  STANDARD
+  OTHER
+}
+
+enum TaxSettingApplyTo {
+  ALL
+  MJ
+  NMJ
+}
+
+enum SupplierType {
+  Lab
+  Distributor
+  Cultivator
+  DeliveryService
+  Dispensary
+  Processor
+  Other
+}
+
+enum OrderStatus {
+  EDIT
+  HOLD
+  VOID
+  PAID
+}
+
+enum PayMethod {
+  CASH
+  CARD
+  ATM
+}
+
+enum CustomerStatus {
+  MEDICALMEMBER
+  EMPLOYEE
+  VETERAN
+}
+
+enum DrawerStatus {
+  PENDING
+  COMPLETED
+}
+
+enum PackageStatus {
+  PENDING
+  ASSIGNED
+}
+
+enum DropType {
+  IN
+  OUT
+}
+
+enum TransferType {
+  Incoming
+  Outgoing
+}
+
+enum TransferStatus {
+  PENDING
+  ACCEPTED
+  VOIDED
+}
+
+enum OrderType {
+  SALE
+  RETURN
+}
+
+enum OrderMjType {
+  NONE
+  MJ
+  NMJ
+}
+
+enum Timezones {
+  EST
+  CST
+  MST
+  PST
+  AKST
+  HAST
+}
+
+enum DiscountMethod {
+  BYPERCENT
+  BYAMOUNT
+  TOAMOUNT
+}

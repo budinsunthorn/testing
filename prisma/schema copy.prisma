@@ -1,0 +1,319 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Organization {
+  id           String       @id @default(cuid())
+  name         String
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  phone        String
+  dispensaries Dispensary[]
+  suppliers    Supplier[]
+}
+
+model Dispensary {
+  id                    String         @id @default(cuid())
+  name                  String
+  businessLicense       String?
+  phone                 String
+  email                 String
+  locationAddress       String
+  locationCity          String
+  locationState         StateType
+  locationZipCode       String
+  createdAt             DateTime       @default(now())
+  updatedAt             DateTime       @updatedAt
+  dispensaryType        DispensaryType
+  organizationId        String
+  metrcApiKey           String?
+  metrcConnectionStatus Boolean        @default(false)
+  metrcLicenseNumber    String?
+  organization          Organization   @relation(fields: [organizationId], references: [id])
+  users                 User[]
+  customers             Customer[]
+  loyalties             Loyalty[]
+  discounts             Discount[]
+  taxSettings           TaxSetting[]
+  Product               Product[]
+  Sale                  Sale[]
+}
+
+model User {
+  id                  String     @id @default(cuid())
+  email               String     @unique
+  name                String
+  dispensaryId        String
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
+  userType            UserType
+  isActive            Boolean    @default(false)
+  isDispensaryAdmin   Boolean    @default(false)
+  isEmailVerified     Boolean    @default(false)
+  isOrganizationAdmin Boolean    @default(false)
+  phone               String
+  password            String
+  dispensary          Dispensary @relation(fields: [dispensaryId], references: [id])
+  Product             Product[]
+  Sale                Sale[]
+  Payment             Payment[]
+}
+
+model Customer {
+  id                           String     @id @default(cuid())
+  name                         String
+  MFType                       MFType     @default(MALE)
+  birthday                     String
+  email                        String
+  phone                        String
+  dispensaryId                 String
+  isActive                     Boolean
+  driverLicense                String
+  driverLicenseExpirationDate  String
+  isMedical                    Boolean
+  medicalLicense               String
+  medicalLicenseExpirationDate String
+  dispensary                   Dispensary @relation(fields: [dispensaryId], references: [id])
+  createdAt                    DateTime   @default(now())
+  updatedAt                    DateTime   @updatedAt
+  Product                      Product[]
+  Sale                         Sale[]
+  Payment                      Payment[]
+}
+
+model Supplier {
+  id              String       @id @default(cuid())
+  name            String
+  businessLicense String?
+  UBI             String?
+  phone           String
+  email           String
+  locationAddress String
+  locationCity    String
+  locationState   StateType
+  locationZipCode String
+  organizationId  String
+  supplierType    SupplierType
+  isActive        Boolean
+  organization    Organization @relation(fields: [organizationId], references: [id])
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  Product         Product[]
+}
+
+model Loyalty {
+  id               String      @id @default(cuid())
+  dispensaryId     String
+  name             String
+  type             LoyaltyType @default(STANDARD)
+  pointWorth       String
+  applyDurationSet Boolean
+  applyFrom        String
+  applyTo          String
+  isActive         Boolean
+  isAdminPin       Boolean
+  color            String
+  dispensary       Dispensary  @relation(fields: [dispensaryId], references: [id])
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+}
+
+model Discount {
+  id               String       @id @default(cuid())
+  dispensaryId     String
+  name             String
+  type             DiscountType @default(STANDARD)
+  discountPercent  String
+  applyDurationSet Boolean
+  applyFrom        String
+  applyTo          String
+  isActive         Boolean
+  isAdminPin       Boolean
+  color            String
+  dispensary       Dispensary   @relation(fields: [dispensaryId], references: [id])
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+}
+
+model Product {
+  id             String        @id @default(cuid())
+  dispensaryId   String
+  dispensary     Dispensary    @relation(fields: [dispensaryId], references: [id])
+  userId         String
+  user           User          @relation(fields: [userId], references: [id])
+  customerId     String
+  customer       Customer      @relation(fields: [customerId], references: [id])
+  supplierId     String
+  supplier       Supplier      @relation(fields: [supplierId], references: [id])
+  itemCategoryId String
+  itemCategory   ItemCategory  @relation(fields: [itemCategoryId], references: [id])
+  sale           Sale[]
+  name           String
+  sku            String
+  upc            String
+  price          Float
+  unitOfMeasure  UnitOfMeasure
+  unitWeight     Float
+  netWeight      Float
+  metrcPackage   String
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+}
+
+model Sale {
+  id             String        @id @default(cuid())
+  dispensaryId   String
+  dispensary     Dispensary    @relation(fields: [dispensaryId], references: [id])
+  userId         String
+  user           User          @relation(fields: [userId], references: [id])
+  customerId     String
+  customer       Customer      @relation(fields: [customerId], references: [id])
+  productId      String
+  product        Product       @relation(fields: [productId], references: [id])
+  salesWeight    Float
+  salesUnit      String
+  metrcPackage   String
+  paymentId      String        @unique
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  ItemCategory   ItemCategory? @relation(fields: [itemCategoryId], references: [id])
+  itemCategoryId String?
+  Payment        Payment?
+}
+
+model Payment {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id])
+  amount     Float
+  saleId     String   @unique
+  sale       Sale     @relation(fields: [saleId], references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model ItemCategory {
+  id         String    @id @default(cuid())
+  name       String
+  stateOfUsa StateType
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  Product    Product[]
+  Sale       Sale[]
+}
+
+model TaxSetting {
+  id           String     @id @default(cuid())
+  dispensaryId String
+  name         String
+  rate         String
+  categories   Json?
+  applyTo      String
+  dispensary   Dispensary @relation(fields: [dispensaryId], references: [id])
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+}
+
+enum StateType {
+  AL
+  AK
+  AZ
+  AR
+  CA
+  CO
+  CT
+  DE
+  FL
+  GA
+  HI
+  ID
+  IL
+  IN
+  IA
+  KS
+  KY
+  LA
+  ME
+  MD
+  MA
+  MI
+  MN
+  MS
+  MO
+  MT
+  NE
+  NV
+  NH
+  NJ
+  NM
+  NY
+  NC
+  ND
+  OH
+  OK
+  OR
+  PA
+  RI
+  SC
+  SD
+  TN
+  TX
+  UT
+  VT
+  VA
+  WA
+  WV
+  WI
+  WY
+}
+
+enum DispensaryType {
+  MED
+  REC
+  MEDREC
+}
+
+enum UserType {
+  MANAGER
+  BUDTENDER
+  ADMIN
+}
+
+enum MFType {
+  MALE
+  FEMALE
+}
+
+enum LoyaltyType {
+  STANDARD
+  OTHER
+}
+
+enum DiscountType {
+  STANDARD
+  OTHER
+}
+
+enum SupplierType {
+  Lab
+  Distributor
+  Cultivator
+  DeliveryService
+  Dispensary
+  Processor
+  Other
+}
+
+enum UnitOfMeasure {
+  Each
+  Grams
+  Oz
+  Milligrams
+}

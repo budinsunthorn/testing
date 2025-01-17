@@ -1,0 +1,1486 @@
+  type Query {
+    organization( id: String!): Organization
+    allOrganizations: [Organization]
+
+    dispensary( id: String!): Dispensary
+    allDispensaries: [Dispensary]
+    allDispensariesByOrganizationId( organizationId: String!): [Dispensary]
+
+    product( id: String!): Product
+    allProductsByDispensaryId( dispensaryId: String!): [Product]
+    allProductsByDispensaryIdWithPages( dispensaryId: String!, pageNumber: Int!, onePageRecords: Int!, searchField: String!, searchParam: String): ProductsWithCount
+    getProductRowsByNameSearch( searchQuery: String!,  dispensaryId: String!): [Product]
+    topProductsForCustomerByDispensaryId(dispensaryId: String!, customerId: String!): [topProductsForCustomer]
+
+    package( id: String!): Package
+    packageByPackageId( packageId: Int!): Package
+    packageByLabel( label: String!): Package
+    allPackagesByDispensaryId( dispensaryId: String!): [Package]
+    allPackagesByDispensaryIdWithPages( dispensaryId: String!, pageNumber: Int!, onePageRecords: Int!, searchField: String!, searchParam: String): PackagesWithCount
+    getPackageRowsByItemSearch( searchQuery: String!,  dispensaryId: String!): [PackageSearchByItem]
+    packagesByDispensaryIdAndStatus( dispensaryId: String!, status: PackageStatus!): [Package]
+
+    supplier( id: String!): Supplier
+    allSuppliersByOrganizationId( organizationId: String!): [Supplier]
+
+    allUsersByDispensaryId( dispensaryId: String!): [User]
+    user( id: String!): User
+
+    admins: [User]
+    admin( id: String!): User
+
+    customer( id: String!): Customer
+    allCustomersByDispensaryId( dispensaryId: String!): [Customer]
+    allCustomerQueueByDispensaryId( dispensaryId: String!): [CustomerQueue]
+    checkIsCustomerInQueue( customerId: String!): CountTypeResponse
+
+    allLoyaltiesByDispensaryId( dispensaryId: String!): [Loyalty]
+    loyalty( id: String!): Loyalty
+
+    allDiscountsByDispensaryId( dispensaryId: String!): [Discount]
+    discount( id: String!): Discount
+
+    allItemCategoriesByDispensaryId( dispensaryId: String!): [ItemCategory]
+    itemCategory(id: String!): ItemCategory
+
+    allTaxSettingByDispensaryId( dispensaryId: String!): [TaxSetting]
+    taxSetting(id: String!): TaxSetting
+
+    allTaxApplyByDispensaryId(dispensaryId: String!): [TaxApply]
+
+    allTransfersByDispensaryIdAndTransferTypeAndStatus( dispensaryId: String!, transferType: String!, status: String!): [Transfer]
+    allTransfersByDispensaryIdAndTransferTypeAndStatusWithPages( dispensaryId: String!, transferType: String!, status: String!, pageNumber: Int!, onePageRecords: Int!, searchField: String!, searchParam: String): TransfersWithCount
+    transferById(id: String!): Transfer
+
+    packagesByDeliveryId(deliveryId: Int!): [DeliveryPackages]
+    packagesByConnectedProductId(productId: String!): [Package]
+
+    allOrdersByDispensaryIdAndDate( dispensaryId: String!,  orderDate: String!): [Order]
+    allOrdersByDispensaryIdAndStatusAndOrderTypeAndSearchParamWithPages( dispensaryId: String!, orderType: OrderType!, status: OrderStatus!, searchField: String! ,searchParam: String!, pageNumber: Int!, onePageRecords: Int!,): OrdersWithCount
+    allOrdersByDrawerId( drawerId: String!): [Order]
+    allOrdersForCurrentDrawer( dispensaryId: String!, userId: String!): [Order]
+    allOrderNumbersByDispensaryIdAndCustomerIdWithPages( dispensaryId: String!, customerId: String!, pageNumber: Int!, onePageRecords: Int!): OrderHistoryWithCount
+
+    order(id: Int!): Order
+    orderWithTaxSum(id: Int!): OrderAndTax
+    orderForReturn(id: Int!): Order
+
+    allInventoryByDispensaryId( dispensaryId: String!): [Inventory]
+
+    allOrderItemsByOrderId( orderId: Int!): [OrderItem]
+
+    metrcInfoByDispensaryId( dispensaryId: String!): metrcInfo!
+    metrcItemCategoryByDispensaryId( dispensaryId: String!): [MetrcItemCategory]
+
+    itemByItemId( itemId: Int!): Package
+
+    currentDrawerByUserId( userId: String!): [Drawer]
+    usingDrawersByDispensaryId( dispensaryId: String!): [Drawer]
+    usingDrawerByDispensaryIdAndUserId(userId: String!, dispensaryId: String!): usingDrawerDataIndex
+
+    # salesMoneyReport( dispensaryId: String!, dateFrom: String!, dateTo: String!): salesMoneyReportResult
+    salesIndexReport( dispensaryId: String!, dateFrom: String!, dateTo: String!): salesIndexReportResult
+
+    paymentCashReport( dispensaryId: String!, dateFrom: String!, dateTo: String!): paymentCashReportResult
+
+  }
+
+  type Mutation {
+
+    createOrganization(input: OrganizationCreateInput!): Organization
+    updateOrganization(input: OrganizationUpdateInput!): Organization
+    deleteOrganization(id: String!): Organization
+
+    createUser(input: UserCreateInput!): User
+    updateUser(input: UserUpdateInput!): User
+    deleteUser(id: String!): User
+
+    createAdmin(input: AdminCreateInput!): User
+    updateAdmin(input: AdminUpdateInput!): User
+
+    createProduct(input: ProductCreateInput!): Product
+    updateProduct(input: ProductUpdateInput!): Product
+    deleteProduct(id: String!): Product
+
+    createCustomer(input: CustomerCreateInput!): Customer
+    updateCustomer(input: CustomerUpdateInput!): Customer
+    updateCustomerNoteByCustomerId(input: CustomerNoteUpdateInput!): Customer
+    deleteCustomer(id: String!): Customer
+
+    createCustomerQueue(input: CustomerQueueCreateInput!): CustomerQueue
+    deleteCustomerQueue(id: String!): CustomerQueue 
+    deleteCustomerQueueByCustomerId(customerId: String!): CountTypeResponse
+
+    createDispensary(input: DispensaryCreateInput!): Dispensary
+    updateDispensary(input: DispensaryUpdateInput!): Dispensary
+    deleteDispensary(id: String!): Dispensary
+
+    createSupplier(input: SupplierCreateInput!): Supplier
+    updateSupplier(input: SupplierUpdateInput!): Supplier
+    deleteSupplier(id: String!): Supplier
+
+    loginUser(input: UserLoginInput!): userData!
+    metrcConnectionUpdate(input: MetrcConnectionInput!): Dispensary
+
+    createLoyalty(input: LoyaltyCreateInput!): Loyalty
+    updateLoyalty(input: LoyaltyUpdateInput!): Loyalty
+    deleteLoyalty(id: String!): Loyalty
+    setLoyaltyForOrder(input: LoyaltySetInput!): LoyaltyHistory
+
+    createDiscount(input: DiscountCreateInput!): Discount
+    updateDiscount(input: DiscountUpdateInput!): Discount
+    deleteDiscount(id: String!): Discount
+    setDiscountForOrder(input: DiscountSetInput!): DiscountHistory
+    cancelDiscountForOrder(orderId: Int!): CountTypeResponse
+
+    createItemCategory(input: ItemCategoryCreateInput!): ItemCategory
+    updateItemCategory(input: ItemCategoryUpdateInput!): ItemCategory
+    deleteItemCategory(id: String!): ItemCategory
+
+    createTaxSetting(input: TaxSettingCreateInput!): TaxSetting
+    updateTaxSetting(input: TaxSettingUpdateInput!): TaxSetting
+    deleteTaxSetting(id: String!, dispensaryId: String!): TaxSetting
+
+    createInventory(input: InventoryCreateInput!): Inventory
+    updateInventory(input: InventoryUpdateInput!): Inventory
+    deleteInventory(id: String!): Inventory
+
+    createOrder(input: OrderCreateInput!): Order
+    holdOrder(input: HoldOrderInput!): Order
+    unHoldOrder(input: HoldOrderInput!): Order
+    voidOrder(input: VoidOrderInput!): Order
+    cancelOrder(input: CancelOrderInput!): Order
+    completeOrder(input: OrderCompleteInput!): Order
+    returnOrder(input: OrderReturnInput!): Order
+
+    createOrderItem(input: OrderItemCreateInput!): OrderItem
+    createOrderItemForReturn(input: OrderItemCreateForReturnInput!): OrderItem
+    deleteOrderItem(id: String!): OrderItem
+    deleteOrderItemsByOrderId(orderId: Int!): CountTypeResponse
+    updateCustomerByOrderId(input: UpdateCustomerByOrderIdInput!): Order
+    updateOrderToReturn(input: UpdateOrderToReturnInput!): Order
+    setRestockForOrderItem(input: SetRestockForOrderItemInput!): OrderItem
+
+    startDrawer(input: DrawerStartInput!): Drawer
+    endDrawer(input: DrawerEndInput!): Drawer
+    setUsingRegister(input: setUsingRegisterUpdateInput!): Drawer
+
+    createMoneyDrop(input: MoneyDropCreateInput!): MoneyDrop
+
+    syncMetrcItemCategory(input: DispensaryIdInput!): CountTypeResponse
+
+    syncMetrcPackage(input: DispensaryIdInput!): CountTypeResponse
+    syncMetrcInactivePackage(input: DispensaryIdInput!): CountTypeResponse
+    
+    syncMetrcIncomingTransfer(input: DispensaryAndUserIdInput!): CountTypeResponse
+    syncDeliveryPackages(input: DispensaryIdInput!): CountTypeResponse
+    importSuppliers(input: OrganizationIdInput!): CountTypeResponse
+
+    assignPackageToProduct(input: AssignPackageToProductInput!): AssignPackage
+  }
+
+  interface MutationResponse {
+    success: Boolean!
+    code: String!
+  }
+
+  type CountTypeResponse {
+    count: Int!
+  }
+
+  type Organization {
+    id: String!
+    name: String!
+    phone: String!
+    dispensaries: [Dispensary]
+    createdAt: DateTime!
+    updatedAt: DateTime!
+  }
+
+  input OrganizationCreateInput {
+    name: String!
+    phone: String!
+  }
+
+  input OrganizationUpdateInput {
+    id: String!
+    name: String!
+    phone: String!
+  }
+
+  input CustomerNoteUpdateInput {
+    customerId: String!
+    note: String!
+  }
+
+  type Dispensary {
+    id: String!
+    name: String!
+    dispensaryType: DispensaryType!
+    organization: Organization!
+    organizationId: String!
+    users: [User]
+    cannabisLicense: String!
+    cannabisLicenseExpireDate: String!
+    businessLicense: String!
+    phone: String!
+    email: String!
+    locationAddress: String!
+    locationCity: String!
+    locationState: StateType!
+    locationZipCode: String!
+    metrcConnectionStatus: Boolean
+    metrcLicenseNumber: String
+    metrcApiKey: String
+    isActive: Boolean
+    isCustomerAgeVerify: Boolean
+    customerAgeLimit: Int!
+    storeTimeZone: Timezones!
+    createdAt: DateTime!
+    updatedAt: DateTime!
+  }
+
+  type Product {
+    id: String!
+    dispensaryId: String!
+    dispensary: Dispensary!
+    userId: String!
+    user: User!
+    supplierId: String!
+    supplier: Supplier!      
+    itemCategoryId: String!
+    itemCategory: ItemCategory!  
+    name: String!
+    sku: String
+    upc: String
+    price: Float!
+    unitOfMeasure: String!
+    unitWeight: Float!
+    netWeight: Float!
+    stock: Float
+    isConnectedWithPackage: Boolean!
+    createdAt: DateTime!      
+    updatedAt: DateTime!      
+  }
+
+  input ProductCreateInput {
+    dispensaryId: String!
+    userId: String!
+    supplierId: String!
+    itemCategoryId: String!
+    name: String!
+    sku: String
+    upc: String
+    price: Float!
+    unitOfMeasure: String!
+    unitWeight: Float!
+    netWeight: Float!
+  }
+
+  input ProductUpdateInput {
+    id: String!
+    supplierId: String!
+    itemCategoryId: String!
+    name: String!
+    sku: String
+    upc: String
+    price: Float!
+    unitOfMeasure: String!
+    unitWeight: Float!
+    netWeight: Float!
+  }
+
+  input DispensaryCreateInput {
+    name: String!
+    dispensaryType: DispensaryType!
+    organizationId: String!
+    cannabisLicense: String!
+    cannabisLicenseExpireDate: String!
+    businessLicense: String
+    phone: String!
+    email: String!
+    locationAddress: String
+    locationCity: String
+    locationState: StateType
+    locationZipCode: String
+    storeTimeZone: Timezones
+    isActive: Boolean
+  }
+
+  input DispensaryUpdateInput {
+    id: String!
+    name: String!
+    dispensaryType: DispensaryType!
+    cannabisLicense: String!
+    cannabisLicenseExpireDate: String!
+    businessLicense: String
+    phone: String!
+    email: String!
+    locationAddress: String
+    locationCity: String
+    locationState: StateType
+    locationZipCode: String
+    isActive: Boolean
+    isCustomerAgeVerify: Boolean
+    customerAgeLimit: Int
+    storeTimeZone: Timezones
+  }
+
+  type User {
+    id: String!
+    userType: UserType!
+    email: String!
+    password: String!
+    name: String!
+    phone: String!
+    dispensary: Dispensary!
+    dispensaryId: String!
+    isEmailVerified: Boolean!
+    isActive: Boolean!
+    isOrganizationAdmin: Boolean!
+    isDispensaryAdmin: Boolean!
+    createdAt: DateTime!
+    updatedAt: DateTime!
+  }
+
+  type Customer {
+    id: String!
+    name: String!
+    MFType: MFType!
+    birthday: String!
+    email: String!
+    phone: String!
+    dispensary: Dispensary!
+    dispensaryId: String!
+    isActive: Boolean!
+    driverLicense: String!
+    driverLicenseExpirationDate: String!
+    isMedical: Boolean!
+    medicalLicense: String!
+    medicalLicenseExpirationDate: String!
+    loyaltyPoints: Float
+    status: CustomerStatus
+    note: String!
+    Order: [Order]
+    createdAt: DateTime!
+    updatedAt: DateTime!
+  }
+
+  type Supplier {
+    id:              String!
+    name:            String!
+    supplierType:    SupplierType
+    businessLicense: String!
+    UBI:             String
+    phone:           String
+    email:           String
+    locationAddress: String
+    locationCity:    String
+    locationState:   StateType
+    locationZipCode: String
+    organizationId:  String
+    isActive:        Boolean!
+    createdAt:       DateTime!
+    updatedAt:       DateTime!
+  }
+
+  input SupplierCreateInput {
+    name:            String!
+    businessLicense: String!
+    UBI:             String!
+    phone:           String!
+    email:           String!
+    locationAddress: String!
+    locationCity:    String!
+    locationState:   StateType!
+    locationZipCode: String!
+    organizationId:  String!
+    supplierType:    SupplierType!
+    isActive:        Boolean!
+  }
+
+  input SupplierUpdateInput {
+    id:              String!
+    name:            String!
+    businessLicense: String!
+    UBI:             String!
+    phone:           String!
+    email:           String!
+    locationAddress: String!
+    locationCity:    String!
+    locationState:   StateType!
+    locationZipCode: String!
+    supplierType:    SupplierType!
+    isActive:        Boolean!
+  }
+
+  type Loyalty {
+    id: String!
+    dispensaryId: String!
+    name: String!
+    type: LoyaltyType!
+    pointWorth: Float!
+    applyDurationSet: Boolean!
+    applyFrom: String!
+    applyTo: String!
+    isActive: Boolean!
+    isAdminPin: Boolean!
+    color: String!
+    createdAt: DateTime!
+    updatedAt: DateTime!
+  }
+
+  type Discount {
+    id: String!
+    dispensaryId: String!
+    applyTarget: CustomerStatus!
+    name: String!
+    type: DiscountType!
+    discountPercent: Float!
+    applyDurationSet: Boolean!
+    applyFrom: String!
+    applyTo: String!
+    isActive: Boolean!
+    isAdminPin: Boolean!
+    isEnterManualAmount:        Boolean!
+    isLimitManualAmount:        Boolean!
+    manualDiscountLimitPercent: Float!
+    color: String!
+    createdAt: DateTime!
+    updatedAt: DateTime!
+  }
+
+  type DiscountHistory {
+    id: String!
+    dispensaryId: String!
+    orderId: Int!
+    discountName: String!
+    discountMethod: DiscountMethod!
+    value: Float!
+  }
+
+  type LoyaltyHistory {
+    id: String!
+    dispensaryId: String!
+    orderId: Int!
+    loyaltyName: String!
+    loyaltyType: LoyaltyType!
+    value: Float!
+  }
+
+  type CustomerQueue {
+    id: String!
+    dispensaryId: String!
+    dispensary: Dispensary!
+    customerId: String!
+    customer: Customer!
+    userId: String!
+    user: User!
+    createdAt: DateTime!
+    updatedAt: DateTime!
+  }
+
+  input CustomerQueueCreateInput {
+    dispensaryId: String!
+    customerId: String!
+    userId: String!
+  }
+
+  type Transfer {
+    id:            String!     
+    dispensaryId:  String!
+    userId:        String!
+    user: User
+    transferType:   TransferType!
+    isMJ:   Boolean!
+    status:  TransferStatus!
+    transferId: Int
+    deliveryId: Int
+    PackageCount: Int
+    ReceivedPackageCount: Int
+    CreatedDateTime: String
+    ReceivedDateTime: String
+    ShipperFacilityLicenseNumber: String
+    ShipperFacilityName: String
+    createdAt: DateTime!
+    updatedAt: DateTime!
+  }
+
+  type Order {
+    id:            Int!     
+    dispensaryId:  String!
+    dispensary: Dispensary
+    drawerId:      String!
+    drawer: Drawer
+    userId:        String!
+    user: User
+    customerId:    String
+    customer:      Customer
+    description:   String
+    orderType: OrderType!
+    cost:   Float
+    cashAmount:   Float
+    changeDue:   Float
+    otherAmount:   Float
+    loyalty:  Float
+    discount: Float
+    mjType: OrderMjType
+    status:        OrderStatus!
+    orderDate:     String
+    isReportedToMetrc: Boolean!
+    metrcId: Int
+    originalOrder: Int
+    voidReason: String
+    voidedAt: DateTime
+    completedAt: DateTime
+    createdAt:     DateTime!
+    updatedAt:     DateTime!   
+    OrderItem:     [OrderItem]
+    DiscountHistory: [DiscountHistory]
+  }
+
+  type OrderAndTax {
+    order: Order,
+    tax: Float
+  }
+
+  input OrderCreateInput {
+    dispensaryId:  String!
+    userId:        String!
+    status:        OrderStatus!
+    orderDate:     String!
+  }
+
+  input HoldOrderInput {
+    id:  Int!
+  }
+
+  input VoidOrderInput {
+    id:  Int!
+    voidReason: String!
+  }
+
+  input CancelOrderInput {
+    id:  Int!
+  }
+
+  input OrderCompleteInput {
+    dispensaryId: String!
+    orderId:   Int!
+    amount:    Float!
+    otherAmount:    Float!
+    cost:    Float!
+    changeDue: Float!
+    discount: Float!
+    method:    PayMethod!
+    payDate:    String!
+  }
+
+  input OrderReturnInput {
+    dispensaryId: String!
+    orderId:   Int!
+    amount:    Float!
+    cost:    Float!
+    changeDue: Float!
+    discount: Float!
+    method:    PayMethod!
+    payDate:    String!
+    returnReason: String!
+  }
+
+  type OrderItem {
+    id:        String!  
+    orderId:   Int!
+    productId: String!
+    product: Product!
+    quantity:  Float!
+    isReturned: Boolean
+    isRestockForReturn: Boolean
+    price: Float!
+    cost: Float!
+    amount: Float!
+    discountedAmount: Float!
+    loyaltyAmount: Float!
+    TaxHistory: [TaxHistory]
+    createdAt: DateTime!
+    updatedAt: DateTime!
+  }
+
+  type TaxHistory {
+    id:        String!  
+    dispensaryId:   String!
+    dispensary: Dispensary!
+    orderId: Int!
+    order:  Order!
+    orderItemId: String!
+    orderItem: OrderItem
+    taxName: String!
+    taxPercent: Float!
+    compoundPercent: Float!
+    taxAmount: Float!
+    createdAt: DateTime!
+    updatedAt: DateTime!
+  }
+
+  type TaxApply {
+    id:        String!  
+    dispensaryId:   String!
+    taxName: String!
+    basePercent: Float!
+    compoundPercent: Float!
+    createdAt: DateTime!
+    updatedAt: DateTime!
+  }
+
+  type Payment {
+    id:        String!
+    dispensaryId:   String!
+    orderId:   Int!
+    amount:    Float!
+    cost:    Float!
+    changeDue: Float!
+    discount: Float!
+    returns: Float!
+    method:    PayMethod!
+    payDate:    String!
+    createdAt: DateTime!
+    updatedAt: DateTime!
+  }
+
+  type MoneyDrop {
+    id:        String!
+    drawerId:   String!
+    dropType: DropType!
+    amount:    Float!
+    reason: String
+    createdAt: DateTime!
+    updatedAt: DateTime!
+  }
+
+  input MoneyDropCreateInput {
+    drawerId:   String!
+    dropType: DropType!
+    amount:    Float!
+    reason: String
+  }
+
+  type Drawer {
+    id:            String!
+    dispensaryId:  String!
+    userId:        String!
+    user: User!
+    startAmount:   Float!
+    endAmount:     Float
+    cashSales:     Float
+    note:          String!
+    comment:       String
+    status:        DrawerStatus!
+    register:      String!
+    isUsing:       Boolean
+    Order:         [Order]
+    createdAt:     DateTime!
+    updatedAt:     DateTime!
+  }
+
+  type usingDrawerDataIndex {
+    id: String!
+    register: String!
+    startedAt: DateTime!
+    cashBalance: Float!
+    numberOfOrders: Int!
+  }
+
+  type AssignPackage {
+    id: String!
+    dispensaryId:  String!
+    userId:        String!
+    productId:     String!
+    Label:     String!
+    packageId: Int!
+    quantity:   Float!
+    cost:   Float!
+    createdAt:     DateTime!
+    updatedAt:     DateTime!
+  }
+
+  input AssignPackageToProductInput {
+    dispensaryId:  String!
+    userId:        String!
+    productId:     String!
+    Label:     String!
+    packageId: Int!
+    quantity:   Float!
+    cost:   Float!
+  }
+
+  input DrawerStartInput {
+    dispensaryId:  String!
+    userId:        String!
+    startAmount:   Float!
+    note:          String!
+    status:        DrawerStatus!
+    isUsing:       Boolean!
+    register:      String
+  }
+
+  input DrawerEndInput {
+    id:  String!
+    endAmount:     Float!
+    cashSales:     Float!
+    comment:       String
+    status:        DrawerStatus!
+    isUsing:       Boolean!
+  }
+
+  input setUsingRegisterUpdateInput {
+    id:  String!
+  }
+
+  input OrderItemCreateInput {
+    orderId:   Int!
+    productId: String!
+    quantity:  Float!
+    price: Float!
+    cost: Float!
+  }
+
+  input OrderItemCreateForReturnInput {
+    orderId:   Int!
+    productId: String!
+    quantity:  Float!
+  }
+
+  type Inventory {
+    id:           String!    
+    dispensaryId: String!
+    productId:    String!
+    quantity:     Float!
+    product: Product
+  }
+
+  input InventoryCreateInput {
+    dispensaryId: String!
+    productId:    String!
+    quantity:     Float!
+  }
+
+  input InventoryUpdateInput {
+    productId:    String!
+    quantity:     Float!
+  }
+
+  # type salesMoneyReportResult {
+  #   mjSum:    String!
+  # }
+
+  type salesIndexReportResult {
+    storeName: String!
+    cannabisLicense: String!
+    dateCreated: String!
+    dateFrom: String!
+    dateTo: String!
+    totalOrders: Int!
+  }
+
+  type paymentCashReportResult {
+    cash: Float!
+    changeDue: Float!
+    returns: Float!
+  }
+
+  type MetrcItemCategory {
+    id:                                String!
+    dispensaryId:                      String!
+    Name:                              String!
+    ProductCategoryType:               String!
+    QuantityType:                      String!
+    RequiresStrain:                    Boolean!
+    RequiresItemBrand:                 Boolean!
+    RequiresAdministrationMethod:      Boolean!
+    RequiresUnitCbdPercent:            Boolean!
+    RequiresUnitCbdContent:            Boolean!
+    RequiresUnitCbdContentDose:        Boolean!
+    RequiresUnitThcPercent:            Boolean!
+    RequiresUnitThcContent:            Boolean!
+    RequiresUnitThcContentDose:        Boolean!
+    RequiresUnitVolume:                Boolean!
+    RequiresUnitWeight:                Boolean!
+    RequiresServingSize:               Boolean!
+    RequiresSupplyDurationDays:        Boolean!
+    RequiresNumberOfDoses:             Boolean!
+    RequiresPublicIngredients:         Boolean!
+    RequiresDescription:               Boolean!
+    RequiresAllergens:                 Boolean!
+    RequiresProductPhotos:             Int!
+    RequiresProductPhotoDescription:   Boolean!
+    RequiresLabelPhotos:               Int!
+    RequiresLabelPhotoDescription:     Boolean!
+    RequiresPackagingPhotos:           Int!
+    RequiresPackagingPhotoDescription: Boolean!
+    CanContainSeeds:                   Boolean!
+    CanBeRemediated:                   Boolean!
+    CanBeDestroyed:                    Boolean!
+    CanBeDecontaminated:                    Boolean!
+    RequiresProductPDFDocuments:       Int!
+    LabTestBatchNames:                 [String]
+    createdAt:                         DateTime!
+    updatedAt:                         DateTime!
+  }
+
+  type PackageSearchByItem {
+    id:                                  String!
+    itemName:                            String!
+    Quantity:                            Float!
+    UnitOfMeasureAbbreviation:           String!
+    itemProductCategoryName:             String!
+  }
+
+  type Package {
+    id:                                  String!
+    dispensaryId:                        String!
+    packageId:                           Int
+    productId:                           String
+    packageStatus:                       PackageStatus!
+    packageLabel:                               String
+    cost:                                Float
+    originalQty:                         Float
+    Quantity:                            Float
+    isConnectedWithProduct:             Boolean
+    PackageType:                         String
+    SourceHarvestCount:                  Int
+    SourcePackageCount:                  Int
+    SourceProcessingJobCount:            Int
+    SourceHarvestNames:                  String
+    SourcePackageLabels:                 String 
+    LocationId:                          Int
+    LocationName:                        String
+    LocationTypeName:                    String
+    UnitOfMeasureName:                   String
+    UnitOfMeasureAbbreviation:           String
+    PatientLicenseNumber:                String
+    ItemFromFacilityLicenseNumber:       String
+    ItemFromFacilityName:                String
+    Note:                                String
+    PackagedDate:                        String
+    ExpirationDate:                      String
+    SellByDate:                          String
+    UseByDate:                           String
+    InitialLabTestingState:              String
+    LabTestingState:                     String
+    LabTestingStateDate:                 String
+    LabTestingPerformedDate:             String
+    LabTestResultExpirationDateTime:     String
+    LabTestingRecordedDate:              DateTime
+    IsProductionBatch:                   Boolean
+    ProductionBatchNumber:               String
+    SourceProductionBatchNumbers:        String
+    IsTradeSample:                       Boolean
+    IsTradeSamplePersistent:             Boolean
+    SourcePackageIsTradeSample:          Boolean
+    IsDonation:                          Boolean
+    IsDonationPersistent:                Boolean
+    SourcePackageIsDonation:             Boolean
+    IsTestingSample:                     Boolean
+    IsProcessValidationTestingSample:    Boolean
+    ProductRequiresRemediation:          Boolean
+    ContainsRemediatedProduct:           Boolean
+    RemediationDate:                     DateTime
+    ProductRequiresDecontamination:          Boolean
+    ContainsDecontaminatedProduct:           Boolean
+    DecontaminationDate:                     Boolean
+    ReceivedDateTime:                    DateTime
+    ReceivedFromManifestNumber:          String
+    ReceivedFromFacilityLicenseNumber:   String
+    ReceivedFromFacilityName:            String
+    IsOnHold:                            Boolean
+    ArchivedDate:                        DateTime
+    IsFinished:                          Boolean
+    FinishedDate:                        DateTime
+    IsOnTrip:                            Boolean
+    IsOnRetailerDelivery:                Boolean
+    PackageForProductDestruction:        String
+    LastModified:                        DateTime
+    RetailIdQrCount:                    Int
+    itemId:                                  Int
+    itemName:                                String
+    itemProductCategoryName:                 String
+    itemProductCategoryType:                 String
+    itemIsExpirationDateRequired:            Boolean
+    itemHasExpirationDate:                   Boolean
+    itemIsSellByDateRequired:                Boolean
+    itemHasSellByDate:                       Boolean
+    itemIsUseByDateRequired:                 Boolean
+    itemHasUseByDate:                        Boolean
+    itemQuantityType:                        String
+    itemDefaultLabTestingState:              String
+    itemUnitOfMeasureName:               String
+    itemApprovalStatus:                      String
+    itemApprovalStatusDateTime:              DateTime
+    itemStrainId:                            Int
+    itemStrainName:                          String
+    itemItemBrandId:                         Int
+    itemItemBrandName:                       String
+    itemAdministrationMethod:                String
+    itemUnitCbdPercent:                      String
+    itemUnitCbdContent:                      String
+    itemUnitCbdContentUnitOfMeasureName:     String
+    itemUnitCbdContentDose:                  String
+    itemUnitCbdContentDoseUnitOfMeasureName: String
+    itemUnitThcPercent:                      String
+    itemUnitThcContent:                      String
+    itemUnitThcContentUnitOfMeasureName:     String
+    itemUnitThcContentDose:                  String
+    itemUnitThcContentDoseUnitOfMeasureId:   String
+    itemUnitThcContentDoseUnitOfMeasureName: String
+    itemUnitVolume:                          Float
+    itemUnitVolumeUnitOfMeasureName:         String
+    itemUnitWeight:                          Float
+    itemUnitWeightUnitOfMeasureName:         String
+    itemServingSize:                         String
+    itemNumberOfDoses:                       String
+    itemUnitQuantity:                        String
+    itemUnitQuantityUnitOfMeasureName:       String
+    itemPublicIngredients:                   String
+    itemDescription:                         String
+    itemAllergens:                           String
+    itemProductImages:                       [String]
+    itemProductPhotoDescription:             String
+    itemLabelImages:                         [String]
+    itemLabelPhotoDescription:               String
+    itemPackagingImages:                     [String]
+    itemPackagingPhotoDescription:           String
+    itemProductPDFDocuments:                 [String]
+    itemIsUsed:                              Boolean
+    itemLabTestBatchNames:                   [String]
+    itemProcessingJobCategoryName:           String
+    itemProductBrandName:                    String
+    ProductLabel:                    String
+    createdAt:                         DateTime!
+    updatedAt:                         DateTime!
+  }
+
+  type DeliveryPackages {
+    id:                         String!
+    dispensaryId:               String
+    deliveryId:                 Int
+    packageId:                  Int          
+    packageLabel:               String
+    package:                    Package
+    ShipmentPackageState:       String
+    ShippedQuantity:            Float
+    ShippedUnitOfMeasureName:   String
+    ReceivedQuantity:           Float
+    ReceivedUnitOfMeasureName:  String
+    createdAt:                  DateTime!
+    updatedAt:                  DateTime!
+  }
+
+
+  input DispensaryIdInput {
+    dispensaryId:                      String!
+  }
+  input OrganizationIdInput {
+    organizationId:                      String!
+  }
+
+  input DispensaryAndUserIdInput {
+    dispensaryId:                      String!
+    userId:                      String!
+  }
+
+  input DiscountSetInput {
+    dispensaryId: String!
+    orderId: Int!
+    discountName: String!
+    discountMethod: DiscountMethod!
+    value: Float!
+  }
+
+  input LoyaltySetInput {
+    dispensaryId: String!
+    orderId: Int!
+    loyaltyName: String!
+    loyaltyType: LoyaltyType!
+    value: Float!
+  }
+
+  input UserCreateInput {
+    userType: GeneralUserType!
+    email: String!
+    name: String!
+    password: String!
+    phone: String!
+    dispensaryId: String!
+    isOrganizationAdmin: Boolean!
+    isDispensaryAdmin: Boolean!
+    isActive: Boolean!
+  }
+
+  input UserUpdateInput {
+    id: String!
+    userType: GeneralUserType!
+    email: String!
+    name: String!
+    phone: String!
+    dispensaryId: String!
+    isActive: Boolean!
+    isDispensaryAdmin: Boolean!
+    isOrganizationAdmin: Boolean!
+  }
+
+  input AdminCreateInput {
+    userType: AdminType!
+    email: String!
+    name: String!
+    password: String!
+    phone: String!
+    dispensaryId: String!
+    isOrganizationAdmin: Boolean!
+    isDispensaryAdmin: Boolean!
+    isActive: Boolean!
+  }
+
+  input AdminUpdateInput {
+    id: String!
+    userType: AdminType!
+    email: String!
+    name: String!
+    phone: String!
+    dispensaryId: String!
+    isActive: Boolean!
+    isDispensaryAdmin: Boolean!
+    isOrganizationAdmin: Boolean!
+  }
+
+  input CustomerCreateInput {
+    name: String!
+    MFType: MFType!
+    birthday: String!
+    email: String!
+    phone: String!
+    dispensaryId: String!
+    isActive: Boolean!
+    driverLicense: String!
+    driverLicenseExpirationDate: String!
+    isMedical: Boolean!
+    medicalLicense: String!
+    medicalLicenseExpirationDate: String!
+    status: CustomerStatus
+  }
+
+  input CustomerUpdateInput {
+    id: String!
+    MFType: MFType!
+    name: String!
+    birthday: String!
+    email: String!
+    phone: String!
+    isActive: Boolean!
+    driverLicense: String!
+    driverLicenseExpirationDate: String!
+    isMedical: Boolean!
+    medicalLicense: String!
+    medicalLicenseExpirationDate: String!
+    status: CustomerStatus
+  }
+
+  input UserLoginInput {
+    email: String!
+    password: String!
+  }
+
+  type userData {
+    token: String!
+  }
+
+  input MetrcConnectionInput {
+    metrcConnectionStatus: Boolean!
+    metrcApiKey: String
+    dispensaryId : String!
+  }
+
+  input LoyaltyCreateInput {
+    dispensaryId: String!
+    name: String!
+    type: LoyaltyType!
+    pointWorth: Float!
+    applyDurationSet: Boolean!
+    applyFrom: String!
+    applyTo: String!
+    isActive: Boolean!
+    isAdminPin: Boolean!
+    color: String!
+  }
+
+  input LoyaltyUpdateInput {
+    id: String!
+    name: String!
+    type: LoyaltyType!
+    pointWorth: Float!
+    applyDurationSet: Boolean!
+    applyFrom: String!
+    applyTo: String!
+    isActive: Boolean!
+    isAdminPin: Boolean!
+    color: String!
+  }
+
+  input DiscountCreateInput {
+    dispensaryId: String!
+    applyTarget: CustomerStatus
+    name: String!
+    type: DiscountType!
+    discountPercent: Float
+    applyDurationSet: Boolean!
+    applyFrom: String!
+    applyTo: String!
+    isActive: Boolean!
+    isAdminPin: Boolean!
+    isEnterManualAmount:        Boolean!
+    isLimitManualAmount:        Boolean!
+    manualDiscountLimitPercent: Float!
+    color: String!
+  }
+
+  input DiscountUpdateInput {
+    id: String!
+    applyTarget: CustomerStatus
+    name: String!
+    type: DiscountType!
+    discountPercent: Float
+    applyDurationSet: Boolean!
+    applyFrom: String!
+    applyTo: String!
+    isActive: Boolean!
+    isAdminPin: Boolean!
+    isEnterManualAmount:        Boolean!
+    isLimitManualAmount:        Boolean!
+    manualDiscountLimitPercent: Float!
+    color: String!
+  }
+
+  type metrcInfo  {
+    metrcConnectionStatus: Boolean!
+    metrcApiKey: String
+    cannabisLicense: String
+    id : String!
+  }
+
+  type ItemCategory {
+    id: String!
+    dispensaryId: String!
+    metrcCategory: String!
+    name: String!
+    color: String!
+    containMj: Boolean!
+    createdAt: DateTime!
+    updatedAt: DateTime!
+  }
+
+  type TaxSetting {
+    id: String!
+    dispensaryId: String!
+    name: String!
+    rate: Float!
+    categories: [ProductCategoryOutput]
+    applyTo: TaxSettingApplyTo!
+    compoundTaxes: [String]
+    isExcludeFromRecreational: Boolean!
+    isExcludeFromTaxExempt: Boolean!
+    createdAt: DateTime!
+    updatedAt: DateTime!
+  }
+
+  input TaxSettingCreateInput {
+    dispensaryId: String!
+    name: String!
+    rate: Float!
+    categories: [ProductCategoryInput]
+    applyTo: TaxSettingApplyTo!
+    compoundTaxes: [String]
+    isExcludeFromRecreational: Boolean!
+    isExcludeFromTaxExempt: Boolean!
+  }
+
+  input TaxSettingUpdateInput {
+    dispensaryId: String!
+    id: String!
+    name: String!
+    rate: Float!
+    categories: [ProductCategoryInput]
+    applyTo: TaxSettingApplyTo!
+    compoundTaxes: [String]
+    isExcludeFromRecreational: Boolean!
+    isExcludeFromTaxExempt: Boolean!
+
+  }
+
+  type OrderNumber {
+    id: Int!
+    orderDate: String!
+    amount: Float!
+  }
+
+  type OrderHistoryWithCount {
+    orderHistory: [OrderNumber],
+    totalCount: Int
+  }
+
+  type PackagesWithCount{
+    packages: [Package],
+    totalCount: Int
+  }
+
+  type ProductsWithCount{
+    products: [Product],
+    totalCount: Int
+  }
+
+  type OrdersWithCount{
+    orders: [Order],
+    totalCount: Int
+  }
+
+  type TransfersWithCount{
+    transfers: [Transfer],
+    totalCount: Int
+  }
+
+  type ProductCategoryOutput {
+    value: String!
+    label: String!
+    color: String!
+  }
+
+  type topProductsForCustomer {
+    category: String!
+    name: String!
+    count: Float!
+  }
+
+  input ProductCategoryInput {
+    value: String!
+    label: String!
+    color: String!
+  }
+  input getUsingDrawerInput {
+    dispensaryId: String!
+    userId: String!
+  }
+
+  input ItemCategoryCreateInput {
+    dispensaryId: String!
+    metrcCategory: String!
+    name: String!
+    color: String!
+    containMj: Boolean!
+  }
+
+  input ItemCategoryUpdateInput {
+    id: String!
+    metrcCategory: String!
+    color: String!
+    name: String!
+    containMj: Boolean!
+  }
+
+  input UpdateCustomerByOrderIdInput {
+    orderId: Int!
+    customerId: String!
+  }
+
+  input UpdateOrderToReturnInput {
+    orderId: Int!
+    originalOrderId: Int!
+  }
+
+  input SetRestockForOrderItemInput {
+    id: String!
+    trueFalse: Boolean!
+  }
+
+  enum StateType {
+    AL
+    AK  
+    AZ
+    AR
+    CA
+    CO
+    CT
+    DE
+    FL
+    GA
+    HI
+    ID
+    IL
+    IN
+    IA
+    KS
+    KY
+    LA
+    ME
+    MD
+    MA
+    MI
+    MN
+    MS
+    MO
+    MT
+    NE
+    NV
+    NH
+    NJ
+    NM
+    NY
+    NC
+    ND
+    OH
+    OK
+    OR
+    PA
+    RI
+    SC
+    SD
+    TN
+    TX
+    UT
+    VT
+    VA
+    WA
+    WV
+    WI
+    WY
+  }
+
+  enum DispensaryType {
+    MED
+    REC
+    MEDREC
+  }
+
+  enum UserType {
+    USER
+    MANAGER_USER
+    ADMIN_MANAGER_USER
+    SUPER_ADMIN_MANAGER_USER
+  }
+
+  enum GeneralUserType {
+    USER
+    MANAGER_USER
+    ADMIN_MANAGER_USER
+  }
+
+  enum AdminType {
+    SUPER_ADMIN_MANAGER_USER  
+  }
+
+  enum MFType {
+    MALE  
+    FEMALE
+  }
+
+  enum LoyaltyType {
+    MANUAL
+    OTHER
+  }
+
+  enum DiscountType {
+    MANUAL
+    STANDARD
+    OTHER
+  }
+
+  enum ProductType {
+    MJ
+    NMJ
+  }
+
+enum TaxSettingApplyTo {
+  ALL
+  MJ
+  NMJ
+  CATEGORY
+}
+
+enum SupplierType {
+  Lab
+  Distributor
+  Cultivator
+  DeliveryService
+  Dispensary
+  Processor
+  Other
+}
+
+enum OrderStatus {
+  EDIT
+  HOLD
+  VOID
+  PAID
+}
+
+enum PayMethod {
+  CASH
+  CARD
+  ATM
+}
+
+enum CustomerStatus {
+  MEDICALMEMBER
+  EMPLOYEE
+  VETERAN
+}
+
+enum DrawerStatus {
+  PENDING
+  COMPLETED
+}
+
+enum DropType {
+  IN
+  OUT
+}
+
+enum PackageStatus {
+  PENDING
+  ASSIGNED
+}
+
+enum TransferType {
+  Incoming
+  Outgoing
+}
+
+enum TransferStatus {
+  PENDING
+  ACCEPTED
+  VOIDED
+}
+
+enum OrderType {
+  SALE
+  RETURN
+}
+
+enum OrderMjType {
+  NONE
+  MJ
+  NMJ
+}
+
+enum DiscountMethod {
+  BYPERCENT
+  BYAMOUNT
+  TOAMOUNT
+}
+
+enum Timezones {
+  EST
+  CST
+  MST
+  PST
+  AKST
+  HAST
+}
+  scalar DateTime
