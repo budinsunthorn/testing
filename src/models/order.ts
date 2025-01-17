@@ -45,10 +45,23 @@ export const getOrderAndTax = async (context, id) => {
                             TaxHistory: true
                         }
                     },
-                    customer: true,
-                    dispensary: true,
-                    drawer: true,
-                    user: true,
+                    customerAmount: true,
+                    instrumentAmount: true,
+                    musicAmount: true,
+                    organAmount: true,
+                    doseAmount: true,
+                    putAmount: true,
+                    petAmount: true,
+                    kitAmount: true,
+                    curtainAmount: true,
+                    womanAmount: true,
+                    praiseAmount: true,
+                    rapidAmount: true,
+                    clownAmount: true,
+                    facultyAmount: true,
+                    dispensaryAmount: true,
+                    drawerAmount: true,
+                    userAmount: true,
                     DiscountHistory: true
                 }
             })
@@ -148,6 +161,46 @@ export const getAllOrdersByDrawerId = async (context, drawerId) => {
     })
 }
 
+export const getSmallOrdersByDrawerId = async (context, drawerId) => {
+    return context.prisma.order.findMany({
+        where: {
+            drawerId: drawerId,
+            OR: [
+                { status: OrderStatus.EDIT },
+                { status: OrderStatus.PAID },
+                { status: OrderStatus.HOLD },
+            ]
+        },
+        include: {
+            customer: true,
+            DiscountHistory: true
+        },
+        orderBy: {
+            id: 'asc',
+        },
+    })
+}
+
+export const getPartOrdersByDrawerId = async (context, drawerId) => {
+    return context.prisma.order.findMany({
+        where: {
+            drawerId: drawerId,
+            OR: [
+                { status: OrderStatus.EDIT },
+                { status: OrderStatus.PAID },
+                { status: OrderStatus.HOLD },
+            ]
+        },
+        include: {
+            customer: true,
+            DiscountHistory: true
+        },
+        orderBy: {
+            id: 'asc',
+        },
+    })
+}
+
 export const getAllOrdersForCurrentDrawer = async (context, args) => {
 
     const getDrawer = await context.prisma.drawer.findMany({
@@ -215,3 +268,5 @@ export const getOrderNumbersByDispensaryIdAndCustomerIdWithPages = async (contex
         totalCount: totalCount
     }
 }
+
+

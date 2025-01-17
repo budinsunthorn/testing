@@ -17,6 +17,65 @@ export const getAllLoyaltiesByDispensaryId = async (context, dispensaryId) => {
     }
 }
 
+export const getLoyalty = async (context, id) => {
+    try {
+        return context.prisma.$transaction(async (tx) => {
+            const order = await tx.loyalty.findUnique({
+                where: { id: id || undefined },
+                include: {
+                    loyalty: {
+                        orderBy: {
+                            id: 'asc' // or 'desc' for descending order
+                        },
+                        include: {
+                            product: {
+                                include: {
+                                    itemCategory: true
+                                }
+                            },
+                            TaxHistory: true
+                        }
+                    },
+                    cashAmount: true,
+                    dogeAmount: true,
+                    primaryAmount: true,
+                    cowAmount: true,
+                    chaosAmount: true,
+                    prainAmount: true,
+                    petAmount: true,
+                    kitAmount: true,
+                    wiseAmount: true,
+                    womanAmount: true,
+                    praiseAmount: true,
+                    rapidAmount: true,
+                    paintAmount: true,
+                    facultyAmount: true,
+                    dispensaryAmount: true,
+                    drawerAmount: true,
+                    userAmount: true,
+                    DiscountHistory: true
+                }
+            })
+
+            const tax = await context.prisma.taxHistory.aggregate({
+                _sum: {
+                    taxAmount: true,
+                },
+                where: {
+                    Id: id,
+                },
+            });
+
+            return {
+                loyalty: loyalty,
+                tax: tax._sum.taxAmount || 0
+            }
+        })
+
+    } catch (e) {
+    }
+}
+
 export const setLoyaltyForOrderItems = async (tx, orderId, loyaltyType, loyaltyValue, baseAmount) => {
 
     return 0

@@ -9,3 +9,9 @@ export const getAllOrganizations = async (context) => {
         orderBy: { id: "asc" },
     })
 }
+
+export const getBigOrganizations = async (context) => {
+    return context.prisma.organization.findMany({
+        orderBy: { id: "asc" },
+    })
+}
