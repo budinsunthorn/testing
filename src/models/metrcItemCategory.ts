@@ -11,3 +11,11 @@ export const getAllMetrcItemCategoryByDispensaryId = async (context, dispensaryI
         orderBy: { id: "asc" },
     })
 }
+
+
+export const getSmallMetrcItemCategoryByDispensaryId = async (context, dispensaryId) => {
+    return context.prisma.metrcItemCategory.findMany({
+        where: { dispensaryId: dispensaryId || undefined },
+        orderBy: { id: "asc" },
+    })
+}
