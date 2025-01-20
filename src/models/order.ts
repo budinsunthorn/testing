@@ -140,6 +140,65 @@ export const getAllOrdersByDispensaryIdAndStatusAndOrderTypeAndSearchParamWithPa
         totalCount: totalCount
     }
 }
+export const getOrderAndSum = async (context, id) => {
+    try {
+        return context.prisma.$transaction(async (tx) => {
+            const order = await tx.order.findUnique({
+                where: { id: id || undefined },
+                include: {
+                    OrderItem: {
+                        orderBy: {
+                            id: 'asc' // or 'desc' for descending order
+                        },
+                        include: {
+                            product: {
+                                include: {
+                                    itemCategory: true
+                                }
+                            },
+                            TaxHistory: true
+                        }
+                    },
+                    customerAmount: true,
+                    instrumentAmount: true,
+                    musicAmount: true,
+                    organAmount: true,
+                    doseAmount: true,
+                    putAmount: true,
+                    getRookie: true,
+                    whiteLetter: true,
+                    oneSlide: true,
+                    mainTarget: true,
+                    soDuring: true,
+                    rapidRunway: true,
+                    largeScale: true,
+                    createPortion: true,
+                    newTicket: true,
+                    smallWolf: true,
+                    orderStart: true,
+                    userAthlete: true
+                }
+            })
+
+            const tax = await context.prisma.taxHistory.aggregate({
+                _sum: {
+                    taxAmount: true,
+                },
+                where: {
+                    orderId: id,
+                },
+            });
+
+            return {
+                order: order,
+                tax: tax._sum.taxAmount || 0
+            }
+        })
+
+    } catch (e) {
+        console.log("ordertax error>>>", e)
+    }
+}
 
 export const getAllOrdersByDrawerId = async (context, drawerId) => {
     return context.prisma.order.findMany({
