@@ -159,11 +159,11 @@ export const getOrderAndSum = async (context, id) => {
                             TaxHistory: true
                         }
                     },
-                    customerAmount: true,
-                    instrumentAmount: true,
-                    musicAmount: true,
-                    organAmount: true,
-                    doseAmount: true,
+                    customerRegister: true,
+                    scaleFind: true,
+                    paintWall: true,
+                    shotOrgan: true,
+                    doseCamp: true,
                     putAmount: true,
                     getRookie: true,
                     whiteLetter: true,
