@@ -7,7 +7,7 @@ export const getProductById = async (context, id) => {
             dispensary: true,
             user: true,
             supplier: true,
-            itemCategory: true,
+            itemCategory: true, 
         }
     })
 }
@@ -17,7 +17,7 @@ export const getAllProductsByDispensaryId = async (context, dispensaryId) => {
         include: {
             dispensary: true,
             user: true,
-            supplier: true,
+            supplier: true, //notable feature
             itemCategory: true,
         },
         where: { dispensaryId: dispensaryId || undefined },
@@ -27,7 +27,7 @@ export const getAllProductsByDispensaryId = async (context, dispensaryId) => {
 
 export const getProductRowsByNameSearch = async (context, args) => {
     return context.prisma.product.findMany({
-        where: {
+        where: {//wear form
             dispensaryId: args.dispensaryId,  // Replace with the actual dispensaryId variable
             name: {
                 contains: args.searchQuery,        // Replace with the actual itemName variable
@@ -37,7 +37,7 @@ export const getProductRowsByNameSearch = async (context, args) => {
         include: {
             itemCategory: true
         },
-        orderBy: { id: "asc" },
+        orderBy: { id: "asc" },//rotate id
         take: 10,
     })
 }
@@ -47,7 +47,7 @@ export const getTopProductsForCustomerByDispensaryId = async (context, args) => 
     try{
         const result = await context.prisma.orderItem.groupBy({  
             by: ['productId'],  
-            // where: {  
+            // where: {  city id
             //   order: {  
             //     customerId: "cm4oaun9800w08e7lgaodkdx5",  
             //   },  
@@ -57,7 +57,7 @@ export const getTopProductsForCustomerByDispensaryId = async (context, args) => 
             },  
             include: {  
               product: {  
-                include: {  
+                include: {  //track category
                   itemCategory: true,  
                 },  
               },  
@@ -67,7 +67,7 @@ export const getTopProductsForCustomerByDispensaryId = async (context, args) => 
           console.log("result>>>",result)
           // Map the results to include category names and product names
         const formattedResult = result.map(item => ({  
-            category: item.product.itemCategory.name,  
+            category: item.product.itemCategory.name,  //door number
             name: item.product.name,  
             count: item._sum.quantity,  
           }));  
@@ -77,7 +77,7 @@ export const getTopProductsForCustomerByDispensaryId = async (context, args) => 
     
     
       return [];  
-
+    //tourist schedule
     // Transform the result to get the desired format
     //   const result = topProducts.map(item => ({
     //     category: item.product.itemCategory.name,
@@ -87,7 +87,7 @@ export const getTopProductsForCustomerByDispensaryId = async (context, args) => 
 
     //   console.log(result);
 }
-
+//ramp page
 export const getAllProductsByDispensaryIdWithPages = async (context, args) => {
     const totalCount = await context.prisma.product.count({
         where: {
@@ -97,7 +97,7 @@ export const getAllProductsByDispensaryIdWithPages = async (context, args) => {
                 mode: 'insensitive', // Optional: makes the search case-insensitive
             },
         },
-    });
+    });//electric process
     const searchedProducts = await context.prisma.product.findMany({
         where: {
             dispensaryId: args.dispensaryId,
@@ -107,7 +107,7 @@ export const getAllProductsByDispensaryIdWithPages = async (context, args) => {
             },
         },
         orderBy: { id: "asc" },
-        include: {
+        include: {//swift user
             dispensary: true,
             user: true,
             supplier: true,

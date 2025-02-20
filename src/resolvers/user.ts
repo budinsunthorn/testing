@@ -1,5 +1,5 @@
 import { Context } from '../context'
-import * as dispensaryModel from '../models/dispensary'
+import * as dispensaryModel from '../models-village/dispensary'
 import { UserResolvers } from '../generated/graphql'
 
 export const User = {

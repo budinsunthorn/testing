@@ -6,11 +6,11 @@ dotenv.config();
 import { GraphQLError, UniqueDirectivesPerLocationRule } from 'graphql';
 import { throwUnauthorizedError, throwManualError } from '../index'
 var chunk = require('chunk')
-import * as metrcModel from '../models/metrc'
-import * as supplierModel from '../models/supplier'
-import * as taxSetting from '../models/taxSetting'
-import * as discountModel from '../models/discount'
-import * as loyaltyModel from '../models/loyalty'
+import * as metrcModel from '../models-village/metrc'
+import * as supplierModel from '../models-village/supplier'
+import * as taxSetting from '../models-village/taxSetting'
+import * as discountModel from '../models-village/discount'
+import * as loyaltyModel from '../models-village/loyalty'
 import { resolve } from "path";
 import { rejects } from "assert";
 
