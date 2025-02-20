@@ -1,8 +1,8 @@
 import { Context } from '../context'
-import * as userModel from '../models/user'
-import * as dispensaryModel from '../models/dispensary'
-import * as supplierModel from '../models/supplier'
-import * as itemCategoryModel from '../models/itemCategory'
+import * as userModel from '../models-village/user'
+import * as dispensaryModel from '../models-village/dispensary'
+import * as supplierModel from '../models-village/supplier'
+import * as itemCategoryModel from '../models-village/itemCategory'
 import { ProductResolvers } from '../generated/graphql'
 
 export const Product = {
