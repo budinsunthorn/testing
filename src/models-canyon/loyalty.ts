@@ -1,24 +1,29 @@
-export const getAllInventoryByDispensaryId = async (context, id) => {
-    return context.prisma.inventory.findMany({
-        include: {
-            product: {
-                include:{
-                    itemCategory: true
-                }
-            }
-        },
-        where: { dispensaryId: id || undefined },
-        orderBy: { id: "asc" },
+export const getLoyaltyById = async (context, id) => {
+    return context.prisma.loyalty.findUnique({
+        where: { id: id || undefined },
     })
 }
 
-export const getInventory = async (context, id) => {
+export const getAllLoyaltiesByDispensaryId = async (context, dispensaryId) => {
+    if(dispensaryId === 0){
+        return context.prisma.loyalty.findMany({
+            orderBy: { id: "asc" },
+        })
+    }else{
+        return context.prisma.loyalty.findMany({
+            where: { dispensaryId: dispensaryId || undefined },
+            orderBy: { id: "asc" },
+        })
+    }
+}
+
+export const getLoyalty = async (context, id) => {
     try {
         return context.prisma.$transaction(async (tx) => {
-            const order = await tx.inventory.findUnique({
+            const order = await tx.loyalty.findUnique({
                 where: { id: id || undefined },
                 include: {
-                    inventory: {
+                    loyalty: {
                         orderBy: {
                             id: 'asc' // or 'desc' for descending order
                         },
@@ -31,21 +36,9 @@ export const getInventory = async (context, id) => {
                             TaxHistory: true
                         }
                     },
-                    deliAmount: true,
-                    cardAmount: true,
-                    sisAmount: true,
-                    cowAmount: true,
-                    chaosAmount: true,
-                    prainAmount: true,
-                    petAmount: true,
-                    kitAmount: true,
-                    cansaAmount: true,
-                    womanAmount: true,
-                    praiseAmount: true,
-                    pointAmount: true,
-                    paintAmount: true,
-                    teslaAmount: true,
-                    dispensaryAmount: true,
+                    cashAmount: true,
+                    dogeAmount: true,
+                    primaryAmount: true,
                     drawerAmount: true,
                     userAmount: true,
                     DiscountHistory: true
@@ -62,11 +55,16 @@ export const getInventory = async (context, id) => {
             });
 
             return {
-                inventory: inventory,
+                loyalty: loyalty,
                 tax: tax._sum.taxAmount || 0
             }
         })
 
     } catch (e) {
     }
+}
+
+export const setLoyaltyForOrderItems = async (tx, orderId, loyaltyType, loyaltyValue, baseAmount) => {
+
+    return 0
 }
