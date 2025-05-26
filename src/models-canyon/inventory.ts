@@ -31,22 +31,6 @@ export const getInventory = async (context, id) => {
                             TaxHistory: true
                         }
                     },
-                    deliAmount: true,
-                    cardAmount: true,
-                    sisAmount: true,
-                    cowAmount: true,
-                    chaosAmount: true,
-                    prainAmount: true,
-                    petAmount: true,
-                    kitAmount: true,
-                    cansaAmount: true,
-                    womanAmount: true,
-                    praiseAmount: true,
-                    pointAmount: true,
-                    paintAmount: true,
-                    teslaAmount: true,
-                    dispensaryAmount: true,
-                    drawerAmount: true,
                     userAmount: true,
                     DiscountHistory: true
                 }
